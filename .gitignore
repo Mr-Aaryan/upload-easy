@@ -1,0 +1,6 @@
+.main.go
+test.db
+/uploads
+/googleutils/credentials.json
+/googleutils/token.json
+.env
