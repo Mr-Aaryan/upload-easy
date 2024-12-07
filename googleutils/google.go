@@ -39,7 +39,6 @@ func UploadToDrive(file *os.File) error {
 		return fmt.Errorf("unable to upload file to Drive: %v", err)
 	}
 
-	fmt.Printf("File uploaded successfully: %s\n", file.Name())
 	return nil
 }
 
@@ -105,12 +104,17 @@ func uploadFile(srv *drive.Service, file *os.File) error {
 		return err
 	}
 
+	fileData, err := file.Stat()
+	if err != nil {
+		log.Fatal("Error reading file info")
+	}
 	fileMetaData := &drive.File{
-		Name: file.Name(),
+		Name: fileData.Name(),
 	}
 	_, err = srv.Files.Create(fileMetaData).Media(file, googleapi.ContentType(contentType)).Do()
 	if err != nil {
 		log.Fatal("Unable to upload file", err)
 	}
+	fmt.Printf("File uploaded successfully: %s\n", fileData.Name())
 	return nil
 }

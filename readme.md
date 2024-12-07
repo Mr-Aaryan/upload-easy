@@ -13,14 +13,14 @@ A simple CLI tool to upload files to **Google Drive** and **Cloudinary**. Upload
 
 1. Install Go if you don't have it already. [Download Go](https://go.dev/dl/).
 2. Clone this repository:
-   \`\`\`bash
+   ```bash
    git clone https://github.com/your-username/upload-easy.git
    cd upload-easy
-   \`\`\`
+   ```
 3. Build and install the tool:
-   \`\`\`bash
+   ```bash
    go install
-   \`\`\`
+   ```
    Ensure the Go bin directory is in your PATH.
 
 ## Usage
@@ -28,20 +28,22 @@ A simple CLI tool to upload files to **Google Drive** and **Cloudinary**. Upload
 ### Upload a File
 
 To upload a file, use the following command:
-\`\`\`bash
+```bash
 upload-easy --file "./upload/file.png"
-\`\`\`
+```
 
 ### Options
 
-- \`--file\` (required): Path to the file to be uploaded.
-- \`--service\` (optional): Specify the upload service (\`drive\` or \`cloudinary\`).
-  - If omitted, the tool will prompt you to choose.
+- `--file` (required): Path to the file to be uploaded.
+- `-g` or `-c` or `-m` (required): Choose between where to upload.
+   -`-g` for Google
+   -`-m` for Mega
+   -`-c` for Cloudinary
 
 Example:
-\`\`\`bash
+```bash
 upload-easy --file "./upload/file.png" --service "drive"
-\`\`\`
+```
 
 ### Configuration
 
@@ -50,39 +52,39 @@ Before using the tool, set up your environment variables:
 #### Google Drive
 
 1. Obtain credentials for Google Drive API by following [this guide](https://developers.google.com/drive/api/v3/quickstart/go).
-2. Save the credentials JSON file as \`credentials.json\` in the project directory.
-3. Set up a \`.env\` file in the project directory:
-   \`\`\`env
+2. Save the credentials JSON file as `credentials.json` in the project directory.
+3. Set up a `.env` file in the project directory:
+   ```env
    GOOGLE_DRIVE_CREDENTIALS=./credentials.json
-   \`\`\`
+   ```
 
 #### Cloudinary
 
 1. Log in to your Cloudinary account and obtain your API key and secret.
 2. Set up the \`.env\` file with the following variables:
-   \`\`\`env
+   ```env
    CLOUDINARY_URL=cloudinary://<API_KEY>:<API_SECRET>@<CLOUD_NAME>
-   \`\`\`
+   ```
 
 ### Examples
 
 #### Upload to Google Drive
 
-\`\`\`bash
+```bash
 upload-easy --file "./upload/file.png" --service "drive"
-\`\`\`
+```
 
 #### Upload to Cloudinary
 
-\`\`\`bash
+```bash
 upload-easy --file "./upload/file.png" --service "cloudinary"
-\`\`\`
+```
 
 #### Let the Tool Prompt You
 
-\`\`\`bash
+```bash
 upload-easy --file "./upload/file.png"
-\`\`\`
+```
 The tool will ask you to select the service.
 
 ## Development
@@ -90,25 +92,25 @@ The tool will ask you to select the service.
 ### Prerequisites
 
 - Go 1.20+ installed.
-- Environment variables configured in \`.env\`.
+- Environment variables configured in `.env`.
 
 ### Run Locally
 
 1. Build the project:
-   \`\`\`bash
+   ```bash
    go build -o upload-easy
-   \`\`\`
+   ```
 2. Execute:
-   \`\`\`bash
+   ```bash
    ./upload-easy --file "./upload/file.png"
-   \`\`\`
+   ```
 
 ### Testing
 
 Run tests using:
-\`\`\`bash
+```bash
 go test ./...
-\`\`\`
+```
 
 ## Roadmap
 
@@ -119,3 +121,19 @@ go test ./...
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+
+## Things to add 
+./googleutils/credentials.json
+//we should download from google console after creating google clientId and all
+
+./googleutils/token.json 
+//google downloads automatically after authentication
+
+
+.env
+```
+CLOUDINARY_URL=<cloudinary_url>
+MEGA_EMAIL=<mega_email>
+MEGA_PASSWORD=<mega_password>
+```

@@ -31,9 +31,13 @@ func main() {
 func uploadFunc() error {
 
 	filePath := flag.String("file", "", "Path to the file to be uploaded")
+	googleUpload := flag.Bool("g", false, "Upload to Google Drive")
+	cloudinaryUpload := flag.Bool("c", false, "Upload to Cloudinary")
+	megaUpload := flag.Bool("m", false, "Upload to Mega")
+
 	flag.Parse()
 
-	if(*filePath == ""){
+	if *filePath == "" {
 		fmt.Println("Error: Please provide a file path using --file flag")
 		os.Exit(1)
 	}
@@ -48,32 +52,26 @@ func uploadFunc() error {
 
 	fmt.Println("File opened successfully:", file_.Name())
 
-	fmt.Println("Where do you want to upload?")
-	fmt.Println("1. Cloudinary\n2. Google\n3. Mega")
-	var choise int
-	fmt.Scan(&choise)
-
-	switch choise {
-	case 1:
+	switch {
+	case *cloudinaryUpload:
 		// CloudinaryUrl := goDotEnv("CLOUDINARY_URL")
 		CloudinaryUrl := "cloudinary://532797552144317:JaOdM6I1Ds5vXUveqHSROkM8s3I@dhshp6y6p"
 		if err := cloudinaryutils.UploadToCloudianary(file_, CloudinaryUrl); err != nil {
 			return fmt.Errorf("failed to upload file to cloudinary: %v", err)
 		}
-	case 2:
+	case *googleUpload:
 		if err := googleutils.UploadToDrive(file_); err != nil {
 			return fmt.Errorf("failed to upload file to drive: %v", err)
 
 		}
-	case 3:
+	case *megaUpload:
 		MegaEmail := goDotEnv("MEGA_EMAIL")
 		MegaPassword := goDotEnv("MEGA_PASSWORD")
 		if err := megautils.UploadToMega(file_, MegaEmail, MegaPassword); err != nil {
 			return fmt.Errorf("failed to upload file to mega: %v", err)
 		}
 	default:
-		fmt.Println("Invalid choise")
-		return nil
+		fmt.Println("Please specify a valid upload destination using -g, -c, or -m.")
 	}
 	return nil
 }
