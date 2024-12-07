@@ -42,7 +42,7 @@ upload-easy --file "./upload/file.png"
 
 Example:
 ```bash
-upload-easy --file "./upload/file.png" --service "drive"
+upload-easy --file "./upload/file.png" -g
 ```
 
 ### Configuration
@@ -61,7 +61,7 @@ Before using the tool, set up your environment variables:
 #### Cloudinary
 
 1. Log in to your Cloudinary account and obtain your API key and secret.
-2. Set up the \`.env\` file with the following variables:
+2. Set up the `.env` file with the following variables:
    ```env
    CLOUDINARY_URL=cloudinary://<API_KEY>:<API_SECRET>@<CLOUD_NAME>
    ```
@@ -124,11 +124,11 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 
 ## Things to add 
-./googleutils/credentials.json
-//we should download from google console after creating google clientId and all
+`./googleutils/credentials.json`
+Download from google console after creating google clientId and all
 
-./googleutils/token.json 
-//google downloads automatically after authentication
+`./googleutils/token.json` 
+Google downloads automatically after authentication
 
 
 .env
