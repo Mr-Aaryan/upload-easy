@@ -55,7 +55,8 @@ func uploadFunc() error {
 
 	switch choise {
 	case 1:
-		CloudinaryUrl := goDotEnv("CLOUDINARY_URL")
+		// CloudinaryUrl := goDotEnv("CLOUDINARY_URL")
+		CloudinaryUrl := "cloudinary://532797552144317:JaOdM6I1Ds5vXUveqHSROkM8s3I@dhshp6y6p"
 		if err := cloudinaryutils.UploadToCloudianary(file_, CloudinaryUrl); err != nil {
 			return fmt.Errorf("failed to upload file to cloudinary: %v", err)
 		}
