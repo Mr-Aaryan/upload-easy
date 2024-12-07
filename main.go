@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 
-	// "github.com/gorilla/mux"
-
 	"upload-easy/cloudinaryutils"
 	"upload-easy/googleutils"
 	"upload-easy/megautils"
