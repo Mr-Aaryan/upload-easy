@@ -1,15 +1,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
 
 	// "github.com/gorilla/mux"
 
-	"learn3/cloudinaryutils"
-	"learn3/googleutils"
-	"learn3/megautils"
+	"upload-easy/cloudinaryutils"
+	"upload-easy/googleutils"
+	"upload-easy/megautils"
 
 	"github.com/joho/godotenv"
 )
@@ -29,8 +30,16 @@ func main() {
 // common function
 func uploadFunc() error {
 
-	filePath := "./uploads/file.png"
-	file_, err := os.Open(filePath)
+	filePath := flag.String("file", "", "Path to the file to be uploaded")
+	flag.Parse()
+
+	if(*filePath == ""){
+		fmt.Println("Error: Please provide a file path using --file flag")
+		os.Exit(1)
+	}
+
+	// filePath := "./uploads/file.png"
+	file_, err := os.Open(*filePath)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return nil

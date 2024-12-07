@@ -1,4 +1,4 @@
-module learn3
+module upload-easy
 
 go 1.23.3
 
