@@ -9,6 +9,7 @@ import (
 
 	"learn3/cloudinaryutils"
 	"learn3/googleutils"
+	"learn3/megautils"
 
 	"github.com/joho/godotenv"
 )
@@ -53,6 +54,12 @@ func uploadFunc() error {
 		if err := googleutils.UploadToDrive(file_); err != nil {
 			return fmt.Errorf("failed to upload file to drive: %v", err)
 
+		}
+	case 3:
+		MegaEmail := goDotEnv("MEGA_EMAIL")
+		MegaPassword := goDotEnv("MEGA_PASSWORD")
+		if err := megautils.UploadToMega(file_, MegaEmail, MegaPassword); err != nil {
+			return fmt.Errorf("failed to upload file to mega: %v", err)
 		}
 	default:
 		fmt.Println("Invalid choise")
