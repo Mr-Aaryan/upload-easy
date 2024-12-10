@@ -28,21 +28,20 @@ A simple CLI tool to upload files to **Google Drive**, **Mega** and **Cloudinary
 ### Upload a File
 
 To upload a file, use the following command:
+
 ```bash
-upload-easy --file "./upload/file.png"
+go run main.go --file "./upload/file.png" -g
 ```
 
 ### Options
 
 - `--file` (required): Path to the file to be uploaded.
-- `-g` or `-c` or `-m` (required): Choose between where to upload.
-   -`-g` for Google
-   -`-m` for Mega
-   -`-c` for Cloudinary
+- `-g` or `-c` or `-m` (required): Choose between where to upload. -`-g` for Google -`-m` for Mega -`-c` for Cloudinary
 
 Example:
+
 ```bash
-upload-easy --file "./upload/file.png" -g
+go run main.go --file "./upload/file.png" -g
 ```
 
 ### Configuration
@@ -52,11 +51,9 @@ Before using the tool, set up your environment variables:
 #### Google Drive
 
 1. Obtain credentials for Google Drive API by following [this guide](https://developers.google.com/drive/api/v3/quickstart/go).
-2. Save the credentials JSON file as `credentials.json` in the project directory.
-3. Set up a `.env` file in the project directory:
-   ```env
-   GOOGLE_DRIVE_CREDENTIALS=./credentials.json
-   ```
+2. Save the credentials JSON file as `credentials.json` in the project directory as `./googleutils/credentials.json`
+3. `./googleutils/token.json` File is automatically created after successful authentication
+
 
 #### Cloudinary
 
@@ -66,24 +63,34 @@ Before using the tool, set up your environment variables:
    CLOUDINARY_URL=cloudinary://<API_KEY>:<API_SECRET>@<CLOUD_NAME>
    ```
 
+#### Mega
+1. Create an mega account if you don't already have it.
+2. Add the following in your `.env` file
+   ```env
+   MEGA_EMAIL=<mega_email>
+   MEGA_PASSWORD=<mega_password>
+   ```
+
 ### Examples
 
 #### Upload to Google Drive
 
 ```bash
-upload-easy --file "./upload/file.png" -g
+go run main.go --file "./upload/file.png" -g
 ```
 
 #### Upload to Cloudinary
 
 ```bash
-upload-easy --file "./upload/file.png" -c
+go run main.go --file "./upload/file.png" -c
 ```
+
 #### Upload to Mega
 
 ```bash
-upload-easy --file "./upload/file.png" -m
+go run main.go --file "./upload/file.png" -m
 ```
+
 ### Prerequisites
 
 - Go 1.20+ installed.
@@ -99,18 +106,3 @@ upload-easy --file "./upload/file.png" -m
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-
-## Things to add 
-`./googleutils/credentials.json`
-Download from google console after creating google clientId and all
-
-`./googleutils/token.json` 
-Google downloads automatically after authentication
-
-
-.env
-```
-CLOUDINARY_URL=<cloudinary_url>
-MEGA_EMAIL=<mega_email>
-MEGA_PASSWORD=<mega_password>
-```
