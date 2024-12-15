@@ -32,6 +32,7 @@ type FileInfo struct {
 }
 
 var recentDir = ""
+var recentFolderId = ""
 
 func handleDir(filePath string) ([]FileInfo, error) {
 	var files []FileInfo
@@ -89,8 +90,9 @@ Example:
 			fmt.Println("Error:", err)
 			os.Exit(0)
 		}
+		fmt.Println(files)
 		for _, file := range files {
-			fmt.Printf("Path: %s, IsDir: %v\n", file.Path, file.IsDir)
+			// fmt.Printf("Path: %s, IsDir: %v\n", file.Path, file.IsDir)
 			if !file.IsDir {
 				dir := path.Dir(file.Path)
 				relativeDir := strings.TrimPrefix(dir, strings.Replace(*filePath, "/*", "", 1))
@@ -141,9 +143,12 @@ func uploadFunc(filePath string, googleUpload bool, cloudinaryUpload bool, megaU
 			return fmt.Errorf("failed to upload file to cloudinary: %v", err)
 		}
 	case googleUpload:
-		if err := googleutils.UploadToDrive(file_); err != nil {
+		err := connection.InitializeGoogleDrive()
+		if err != nil {
+			return fmt.Errorf("%v", err)
+		}
+		if err = googleutils.UploadToDrive(file_, recentFolderId); err != nil {
 			return fmt.Errorf("failed to upload file to drive: %v", err)
-
 		}
 	case megaUpload:
 		MegaEmail := goDotEnv("MEGA_EMAIL")
@@ -175,8 +180,14 @@ func createFolderFunc(folderName string, googleUpload bool, cloudinaryUpload boo
 			return fmt.Errorf("error creating folder in cloudinary: %v", err)
 		}
 	case googleUpload:
-		return fmt.Errorf("option doesnt exist")
-
+		err := connection.InitializeGoogleDrive()
+		if err != nil {
+			return fmt.Errorf("%v", err)
+		}
+		recentFolderId, err = googleutils.CreateDriveFolder(path.Base(folderName), recentFolderId); 
+		if err != nil {
+			return fmt.Errorf("failed to create folder in drive: %v", err)
+		}
 	case megaUpload:
 		return fmt.Errorf("option doesnt exist")
 	default:
