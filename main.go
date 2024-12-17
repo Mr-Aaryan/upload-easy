@@ -14,6 +14,8 @@ import (
 	"upload-easy/googleutils"
 	"upload-easy/megautils"
 
+	"upload-easy/utils"
+
 	"github.com/joho/godotenv"
 )
 
@@ -29,27 +31,6 @@ type FileInfo struct {
 	Path     string
 	IsDir    bool
 	Children []FileInfo
-}
-
-var recentDir = ""
-var recentFolderId = ""
-
-func handleDir(filePath string) ([]FileInfo, error) {
-	var files []FileInfo
-	filePath = strings.Replace(filePath, "/*", "", 1)
-	// fmt.Println(filePath)
-	err := filepath.Walk(filePath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		files = append(files, FileInfo{Path: path, IsDir: info.IsDir()})
-		// fmt.Println(files)
-		return nil
-	})
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	return files, nil
 }
 
 func main() {
@@ -84,41 +65,23 @@ Example:
 	if *filePath == "" {
 		fmt.Println("Error: Please provide a file path using --file flag")
 		os.Exit(1)
-	} else if f := strings.Contains(*filePath, "/*"); f {
-		files, err := handleDir(*filePath)
+	}
+
+	// if its folder, this will trigger
+	if info, err := os.Stat(*filePath); err == nil && info.IsDir() {
+		err := processDirectory(*filePath, *googleUpload, *cloudinaryUpload, *megaUpload)
 		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(0)
-		}
-		fmt.Println(files)
-		for _, file := range files {
-			// fmt.Printf("Path: %s, IsDir: %v\n", file.Path, file.IsDir)
-			if !file.IsDir {
-				dir := path.Dir(file.Path)
-				relativeDir := strings.TrimPrefix(dir, strings.Replace(*filePath, "/*", "", 1))
-				if relativeDir == "." {
-					relativeDir = "uploads" // Default to "uploads" for base files
-				}
-				err := uploadFunc(file.Path, *googleUpload, *cloudinaryUpload, *megaUpload, relativeDir)
-				if err != nil {
-					log.Fatalf("Upload failed: %v", err)
-				}
-			} else {
-				recentDir = file.Path
-				err := createFolderFunc(recentDir, *googleUpload, *cloudinaryUpload, *megaUpload)
-				if err != nil {
-					log.Fatalf("Folder creation failed: %v", err)
-				}
-			}
+			log.Fatalf("Failed to process directory: %v", err)
 		}
 		os.Exit(0)
 	}
 
-	// filePath := "./uploads/file.png"
+	// it its file, this will trigger
 	err := uploadFunc(*filePath, *googleUpload, *cloudinaryUpload, *megaUpload, "")
 	if err != nil {
 		log.Fatalf("Upload failed: %v", err)
 	}
+	os.Exit(0)
 }
 
 // common upload function
@@ -130,7 +93,7 @@ func uploadFunc(filePath string, googleUpload bool, cloudinaryUpload bool, megaU
 	}
 	defer file_.Close()
 
-	fmt.Println("File opened successfully:", file_.Name())
+	// fmt.Println("File opened successfully:", file_.Name())
 
 	switch {
 	case cloudinaryUpload:
@@ -139,6 +102,9 @@ func uploadFunc(filePath string, googleUpload bool, cloudinaryUpload bool, megaU
 		if err != nil {
 			return fmt.Errorf("failed to initialize cloudinary: %v", err)
 		}
+		fmt.Println("Directory", Directory)
+		fmt.Println("fileee", file_)
+		Directory = strings.TrimPrefix(Directory, "./")
 		if err = cloudinaryutils.UploadToCloudianary(file_, Directory); err != nil {
 			return fmt.Errorf("failed to upload file to cloudinary: %v", err)
 		}
@@ -147,7 +113,9 @@ func uploadFunc(filePath string, googleUpload bool, cloudinaryUpload bool, megaU
 		if err != nil {
 			return fmt.Errorf("%v", err)
 		}
-		if err = googleutils.UploadToDrive(file_, recentFolderId); err != nil {
+		parentId := utils.PeekStack()
+
+		if err = googleutils.UploadToDrive(file_, parentId); err != nil {
 			return fmt.Errorf("failed to upload file to drive: %v", err)
 		}
 	case megaUpload:
@@ -184,14 +152,50 @@ func createFolderFunc(folderName string, googleUpload bool, cloudinaryUpload boo
 		if err != nil {
 			return fmt.Errorf("%v", err)
 		}
-		recentFolderId, err = googleutils.CreateDriveFolder(path.Base(folderName), recentFolderId); 
+		parentId := utils.PeekStack()
+		parentId, err = googleutils.CreateDriveFolder(path.Base(folderName), parentId)
 		if err != nil {
 			return fmt.Errorf("failed to create folder in drive: %v", err)
 		}
+		utils.PushToStack(parentId)
 	case megaUpload:
 		return fmt.Errorf("option doesnt exist")
 	default:
 		return fmt.Errorf("undefined flag")
 	}
+	return nil
+}
+
+// process dir recursively
+func processDirectory(directory string, googleUpload bool, cloudinaryUpload bool, megaUpload bool) error {
+	//list items of directory
+	entries, err := os.ReadDir(directory)
+	// fmt.Println(entries, len(entries))
+	if err != nil {
+		return fmt.Errorf("failed to read directory %s: %v", directory, err)
+	}
+	err = createFolderFunc(directory, googleUpload, cloudinaryUpload, megaUpload)
+	if err != nil {
+		return fmt.Errorf("error creating folder: %v", err)
+	}
+
+	//iterate through dir entries
+	for _, entry := range entries {
+		fmt.Printf("filePath: %v\n", entry)
+		fullPath := filepath.Join(directory, entry.Name())
+		if entry.IsDir() {
+			err := processDirectory(fullPath, googleUpload, cloudinaryUpload, megaUpload)
+			if err != nil {
+				return fmt.Errorf("failed to process subdirectory %s: %v", fullPath, err)
+			}
+		} else {
+			err := uploadFunc(fullPath, googleUpload, cloudinaryUpload, megaUpload, directory)
+			if err != nil {
+				return fmt.Errorf("failed to upload file %s: %v", fullPath, err)
+			}
+		}
+	}
+
+	utils.PopFromStack()
 	return nil
 }

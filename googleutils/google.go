@@ -64,6 +64,6 @@ func CreateDriveFolder(folderName string, parentId string) (string, error){
 	if err != nil {
 		return "", fmt.Errorf("unable to create folder: %v", err)
 	}
-	fmt.Println("folder created successfully. FolderId: ", folder.Id)
+	fmt.Println("Folder created successfully. Folder: ", folderName)
 	return folder.Id, nil
 }
