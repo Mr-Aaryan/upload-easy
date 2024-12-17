@@ -1,3 +1,4 @@
+
 # Upload Easy
 
 A simple CLI tool to upload files to **Google Drive**, **Mega** and **Cloudinary**. Upload files directly from your terminal with ease, just like using an npm package.
@@ -6,7 +7,8 @@ A simple CLI tool to upload files to **Google Drive**, **Mega** and **Cloudinary
 
 - Upload files to Google Drive.
 - Upload files to Cloudinary.
-- Select the desired upload service based on your preference.
+- Upload files to Mega.
+- Support for directory uploads (including subdirectories).
 - Simple and intuitive CLI interface.
 
 ## Installation
@@ -35,14 +37,26 @@ go run main.go --file "./upload/file.png" -g
 
 ### Options
 
-- `--file` (required): Path to the file to be uploaded.
-- `-g` or `-c` or `-m` (required): Choose between where to upload. -`-g` for Google -`-m` for Mega -`-c` for Cloudinary
+- `--file` (required): Path to the file or directory to be uploaded.
+- `-g` (optional): Upload to Google Drive.
+- `-c` (optional): Upload to Cloudinary.
+- `-m` (optional): Upload to Mega.
 
 Example:
 
 ```bash
 go run main.go --file "./upload/file.png" -g
 ```
+
+### Upload Directories
+
+To upload directories with their contents, use the following format:
+
+```bash
+go run main.go --file "./uploads"
+```
+
+This will upload the directory contents to the selected cloud service. All files in the directory and subdirectories will be processed.
 
 ### Configuration
 
@@ -51,9 +65,8 @@ Before using the tool, set up your environment variables:
 #### Google Drive
 
 1. Obtain credentials for Google Drive API by following [this guide](https://developers.google.com/drive/api/v3/quickstart/go).
-2. Save the credentials JSON file as `credentials.json` in the project directory as `./googleutils/credentials.json`
-3. `./googleutils/token.json` File is automatically created after successful authentication
-
+2. Save the credentials JSON file as `credentials.json` in the project directory as `./googleutils/credentials.json`.
+3. The `./googleutils/token.json` file will be automatically created after a successful authentication.
 
 #### Cloudinary
 
@@ -64,8 +77,9 @@ Before using the tool, set up your environment variables:
    ```
 
 #### Mega
-1. Create an mega account if you don't already have it.
-2. Add the following in your `.env` file
+
+1. Create a Mega account if you don't already have one.
+2. Add the following to your `.env` file:
    ```env
    MEGA_EMAIL=<mega_email>
    MEGA_PASSWORD=<mega_password>
@@ -91,6 +105,24 @@ go run main.go --file "./upload/file.png" -c
 go run main.go --file "./upload/file.png" -m
 ```
 
+#### Upload a Directory to Google Drive
+
+```bash
+go run main.go --file "./uploads" -g
+```
+
+#### Upload a Directory to Cloudinary
+
+```bash
+go run main.go --file "./uploads" -c
+```
+
+#### Upload a Directory to Mega
+
+```bash
+go run main.go --file "./uploads" -m
+```
+
 ### Prerequisites
 
 - Go 1.20+ installed.
@@ -105,4 +137,3 @@ go run main.go --file "./upload/file.png" -m
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
