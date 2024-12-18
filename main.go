@@ -92,6 +92,7 @@ func uploadFunc(filePath string, googleUpload bool, cloudinaryUpload bool, megaU
 		return nil
 	}
 	defer file_.Close()
+	Directory = strings.TrimPrefix(Directory, "./")
 
 	// fmt.Println("File opened successfully:", file_.Name())
 
@@ -104,9 +105,8 @@ func uploadFunc(filePath string, googleUpload bool, cloudinaryUpload bool, megaU
 		}
 		fmt.Println("Directory", Directory)
 		fmt.Println("fileee", file_)
-		Directory = strings.TrimPrefix(Directory, "./")
 		if err = cloudinaryutils.UploadToCloudianary(file_, Directory); err != nil {
-			return fmt.Errorf("failed to upload file to cloudinary: %v", err)
+			return fmt.Errorf("cloudinary: %v", err)
 		}
 	case googleUpload:
 		err := connection.InitializeGoogleDrive()
@@ -116,13 +116,18 @@ func uploadFunc(filePath string, googleUpload bool, cloudinaryUpload bool, megaU
 		parentId := utils.PeekStack()
 
 		if err = googleutils.UploadToDrive(file_, parentId); err != nil {
-			return fmt.Errorf("failed to upload file to drive: %v", err)
+			return fmt.Errorf("drive: %v", err)
 		}
 	case megaUpload:
 		MegaEmail := goDotEnv("MEGA_EMAIL")
 		MegaPassword := goDotEnv("MEGA_PASSWORD")
-		if err := megautils.UploadToMega(file_, MegaEmail, MegaPassword); err != nil {
-			return fmt.Errorf("failed to upload file to mega: %v", err)
+		err := connection.InitializeMega(MegaEmail, MegaPassword)
+		if err != nil {
+			return fmt.Errorf("mega: %v", err)
+		}
+		parentId:= utils.PeekStack()
+		if err := megautils.UploadToMega(file_, parentId); err != nil {
+			return fmt.Errorf("mega: %v", err)
 		}
 	default:
 		fmt.Println("Please specify a valid upload destination using -g, -c, or -m.")
@@ -136,6 +141,7 @@ func createFolderFunc(folderName string, googleUpload bool, cloudinaryUpload boo
 		return fmt.Errorf("foldername is not defined: %v", folderName)
 	}
 	fmt.Println("folder:", folderName)
+	folderName = strings.TrimPrefix(folderName, "./")
 	switch {
 	case cloudinaryUpload:
 		CloudinaryUrl := goDotEnv("CLOUDINARY_URL")
@@ -159,7 +165,18 @@ func createFolderFunc(folderName string, googleUpload bool, cloudinaryUpload boo
 		}
 		utils.PushToStack(parentId)
 	case megaUpload:
-		return fmt.Errorf("option doesnt exist")
+		MegaEmail := goDotEnv("MEGA_EMAIL")
+		MegaPassword := goDotEnv("MEGA_PASSWORD")
+		err := connection.InitializeMega(MegaEmail, MegaPassword)
+		if err != nil {
+			return fmt.Errorf("failed to initialize mega: %v", err)
+		}
+		parentId := utils.PeekStack()
+		err = megautils.CreateFolderMega(path.Base(folderName), parentId)
+		if err != nil {
+			return fmt.Errorf("failed to create folder in mega: %v", err)
+		}
+		utils.PushToStack(folderName)
 	default:
 		return fmt.Errorf("undefined flag")
 	}
@@ -181,7 +198,7 @@ func processDirectory(directory string, googleUpload bool, cloudinaryUpload bool
 
 	//iterate through dir entries
 	for _, entry := range entries {
-		fmt.Printf("filePath: %v\n", entry)
+		fmt.Printf("\nfilePath: %v", entry)
 		fullPath := filepath.Join(directory, entry.Name())
 		if entry.IsDir() {
 			err := processDirectory(fullPath, googleUpload, cloudinaryUpload, megaUpload)

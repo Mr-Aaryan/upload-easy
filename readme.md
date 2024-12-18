@@ -1,7 +1,7 @@
 
 # Upload Easy
 
-A simple CLI tool to upload files to **Google Drive**, **Mega** and **Cloudinary**. Upload files directly from your terminal with ease, just like using an npm package.
+A simple CLI tool to upload files to **Google Drive**, **Mega** and **Cloudinary**. Upload files directly from your terminal with ease.
 
 ## Features
 
@@ -89,39 +89,41 @@ Before using the tool, set up your environment variables:
 
 #### Upload to Google Drive
 
+## File
 ```bash
 go run main.go --file "./upload/file.png" -g
 ```
 
-#### Upload to Cloudinary
-
-```bash
-go run main.go --file "./upload/file.png" -c
-```
-
-#### Upload to Mega
-
-```bash
-go run main.go --file "./upload/file.png" -m
-```
-
-#### Upload a Directory to Google Drive
-
+## Folder
 ```bash
 go run main.go --file "./uploads" -g
 ```
 
-#### Upload a Directory to Cloudinary
+#### Upload to Cloudinary
 
+## File
+```bash
+go run main.go --file "./upload/file.png" -c
+```
+
+## Folder
 ```bash
 go run main.go --file "./uploads" -c
 ```
 
-#### Upload a Directory to Mega
 
+#### Upload to Mega
+
+## File
+```bash
+go run main.go --file "./upload/file.png" -m
+```
+
+## Folder
 ```bash
 go run main.go --file "./uploads" -m
 ```
+
 
 ### Prerequisites
 
